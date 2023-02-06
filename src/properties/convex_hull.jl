@@ -1,35 +1,80 @@
-# TODO: Fix this! 
-function safe_convexhull(img) 
-    function getboundarypoints(img)
-        points = CartesianIndex{2}[]
-        for j in axes(img, 2)
-            v = Base.view(img, :, j)
-            i1 = findfirst(v)
-            if !isnothing(i1)
-                i2 = findlast(v)
-                push!(points, CartesianIndex(i1, j))
-                if i1 != i2
-                    push!(points, CartesianIndex(i2, j))
-                end
+# TODO: Rewrite convex hull yourself!
+function convex_hull(perimeter)
+    points = CartesianIndex.(perimeter)
+    function right_oriented(ref, a, b)
+        return (a[2] - ref[2]) * (b[1] - ref[1]) - (b[2] - ref[2]) * (a[1] - ref[1]) < 0
+    end
+
+    function collinear(a, b, c)
+        return (a[2] - c[2]) * (b[1] - c[1]) - (b[2] - c[2]) * (a[1] - c[1]) == 0
+    end
+
+    dist2(a, b) = sum(abs2, (a - b).I)
+    function angularsort!(points, ref)
+        last_point = ref
+
+        for i in eachindex(points)
+            if points[i] == last_point
+                deleteat!(points, i)
+                break
             end
         end
-        return points
+
+        sort!(points; lt=(a, b) -> right_oriented(last_point, a, b))
+
+        i = 0
+        while i <= length(points)
+            i = i + 1
+            if i + 1 > length(points)
+                break
+            end
+
+            if collinear(last_point, points[i], points[i + 1])
+                if dist2(last_point, points[i]) < dist2(last_point, points[i + 1])
+                    deleteat!(points, i)
+                else
+                    deleteat!(points, i + 1)
+                end
+                i = i - 1
+            end
+        end
     end
-    points = getboundarypoints(img)
-    if length(points) > 3
-        return Tuple.(convexhull(img))
-    else
-        return []
+    last_point = points[1]
+    for point in points
+        if point[2] > last_point[2] || (point[2] == last_point[2] && point[1] > last_point[1])
+            last_point = point
+        end
     end
+    angularsort!(points, last_point)
+    
+    convex_hull = CartesianIndex{2}[]
+    if length(points) < 3
+        return Tuple.(convex_hull)
+    end
+    push!(convex_hull, last_point)
+    push!(convex_hull, points[1])
+    push!(convex_hull, points[2])
+    n_points = length(points)
+    for i in 3:n_points
+        while (
+            right_oriented(convex_hull[end], convex_hull[end - 1], points[i]) ||
+            collinear(convex_hull[end], convex_hull[end - 1], points[i])
+        )
+            pop!(convex_hull)
+            if length(convex_hull) == 1
+                return Tuple.(convex_hull)
+            end
+        end
+        push!(convex_hull, points[i])
+    end
+
+    return Tuple.(convex_hull)
 end
 
-
 function add_component_convex_hull!(rp::RegionProps, component)
-    boxes = @! rp.bounding_box
+    perimeter_points = @! rp.perimeter_points
     
-    views = [bbox_to_view(box, rp.label, true) .|> >(0) for box ∈ boxes]
-
-    rp.convex_hull = safe_convexhull.(views)
+    rp.convex_hull = convex_hull.(perimeter_points)
     return rp[component]
 end
 

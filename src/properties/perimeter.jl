@@ -27,10 +27,19 @@ function find_perimeter_points(img)
     return (perimeter, Tuple.(points))
 end
 
+function image_from_subscripts(subscripts, box)
+    result = OffsetArray(
+        falses(box[2] .- box[1] .+ 1), 
+        Base.splat(range).(box |> unzip)...)
+    result[CartesianIndex.(subscripts)] .= true
+    return result
+end
+
 function add_component_perimeter!(rp::RegionProps, component)
-    views = @! rp.image
+    subs = @! rp.subscripts
+    boxes = @! rp.bounding_box
     
-    perimeters, points = unzip(find_perimeter_points.(views))
+    perimeters, points = unzip(find_perimeter_points.(image_from_subscripts.(subs, boxes)))
     rp.perimeter = perimeters
     rp.perimeter_points = points
     return rp[component]
