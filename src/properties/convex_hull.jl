@@ -1,4 +1,28 @@
-safe_convexhull(img) = prod(size(img)) > 10 ? Tuple.(convexhull(img)) : []
+# TODO: Fix this! 
+function safe_convexhull(img) 
+    function getboundarypoints(img)
+        points = CartesianIndex{2}[]
+        for j in axes(img, 2)
+            v = Base.view(img, :, j)
+            i1 = findfirst(v)
+            if !isnothing(i1)
+                i2 = findlast(v)
+                push!(points, CartesianIndex(i1, j))
+                if i1 != i2
+                    push!(points, CartesianIndex(i2, j))
+                end
+            end
+        end
+        return points
+    end
+    points = getboundarypoints(img)
+    if length(points) > 3
+        return Tuple.(convexhull(img))
+    else
+        return []
+    end
+end
+
 
 function add_component_convex_hull!(rp::RegionProps, component)
     boxes = @! rp.bounding_box
