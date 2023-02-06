@@ -1,4 +1,4 @@
-safe_convexhull(img) = prod(size(img)) > 4 ? Tuple.(convexhull(img)) : []
+safe_convexhull(img) = prod(size(img)) > 10 ? Tuple.(convexhull(img)) : []
 
 function add_component_convex_hull!(rp::RegionProps, component)
     boxes = @! rp.bounding_box
