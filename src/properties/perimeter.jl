@@ -24,13 +24,13 @@ function find_perimeter_points(img)
     corner = chain .≠ CircularArray(chain)[0:end-1]
     perimeter = sum(iseven, chain, init=0)*0.980 + sum(isodd, chain, init=0)*1.406 - sum(corner, init=0)*0.091;
 
-    return (perimeter, points)
+    return (perimeter, Tuple.(points))
 end
 
 function add_component_perimeter!(rp::RegionProps, component)
-    boxes = @! rp.bounding_box
+    views = @! rp.image
     
-    perimeters, points = unzip([bbox_to_view(box, rp.label, true) .|> >(0) |> find_perimeter_points for box ∈ boxes])
+    perimeters, points = unzip(find_perimeter_points.(views))
     rp.perimeter = perimeters
     rp.perimeter_points = points
     return rp[component]

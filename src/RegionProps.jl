@@ -20,7 +20,6 @@ names_to_functions = (
     subscripts = add_std_component!(component_subscripts))
 
 macro add_named_component(name_expr, expr)
-    println("Adding $name_expr")
     :(names_to_functions = (;names_to_functions..., $name_expr=$expr)) |> esc
 end
 
@@ -59,6 +58,7 @@ Base.setindex(rp::RegionProps, v, i) = setproperty!(rp, i, v)
 
 function regionprops(img, properties...)
     rp = RegionProps(img)
-    vals = (@!(rp[property]) for property ∈ properties)
-    return map((vals...)->(; Pair.(properties, vals)...), vals...)
+    return StructArray((; (property=>@!(rp[property]) for property ∈ properties)...))
 end
+
+get_available_properties() = keys(names_to_functions)

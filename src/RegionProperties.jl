@@ -1,15 +1,15 @@
 module RegionProperties
 
-export regionprops, bbox_to_view
+export regionprops, index_to_point, indices_to_points, get_available_properties
 
-using Images, CircularArrays, StaticArrays, OffsetArrays
+using Images
+using CircularArrays, StaticArrays, OffsetArrays, StructArrays
+using Statistics, PolygonOps
 
 include("utils.jl")
 include("RegionProps.jl")
 
-# include.(readdir(joinpath(@__DIR__, "properties/"), join=true))
-include("properties/circularity.jl")
-include("properties/ellipse.jl")
-include("properties/perimeter.jl")
+include.(readdir(joinpath(@__DIR__, "properties/"), join=true))
+
 
 end # module RegionProps

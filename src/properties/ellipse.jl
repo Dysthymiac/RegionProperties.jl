@@ -2,14 +2,14 @@ function add_component_ellipse!(rp::RegionProps, component)
     all_points = (reduce(hcat, SVector.(points)) for points ∈ @!(rp.subscripts))
     centroids = SVector.(@! rp.centroid)
 
-    major = zeros(length(points))
-    minor = zeros(length(points))
-    orientations = zeros(length(points))
+    major = zeros(length(all_points))
+    minor = zeros(length(all_points))
+    orientations = zeros(length(all_points))
 
     for (i, (centroid, points)) ∈ enumerate(zip(centroids, all_points))
         x = points[2, :] .- centroid[2]
         y = -(points[1, :] .- centroid[1])
-
+        
         uxx = mean(x.^2) + 1/12
         uyy = mean(y.^2) + 1/12
         uxy = mean(x.*y)

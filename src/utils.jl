@@ -9,3 +9,7 @@ function bbox_to_view(box, img, preserve_indices=false)
         return view_box    
     end
 end
+
+index_to_point(idx) = idx |> Tuple |> SVector
+
+indices_to_points(idx) = reduce(hcat, index_to_point.(idx))
