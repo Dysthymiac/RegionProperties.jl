@@ -3,6 +3,12 @@ uuid = "7e4e0b8b-c64d-426d-a840-1be9d0e76528"
 authors = ["Dysthymiac"]
 version = "0.1.0"
 
+[deps]
+CircularArrays = "7a955b69-7140-5f4e-a0ed-f168c5e2e749"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
 [compat]
 julia = "1"
 
