@@ -9,7 +9,7 @@ struct RegionProps{T1}
 end
 
 add_std_component!(f) = function add_component(rp, component) 
-    rp.computed_components[component] = f(rp.label)[2:end]
+    rp.computed_components[component] = f(rp.label)[1:end]
 end
 
 names_to_functions = (
