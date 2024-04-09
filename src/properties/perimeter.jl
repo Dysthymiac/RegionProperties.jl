@@ -29,8 +29,8 @@ end
 
 function image_from_subscripts(subscripts, box)
     result = OffsetArray(
-        falses(box[2] .- box[1] .+ 1), 
-        Base.splat(range).(box |> unzip)...)
+        falses(size(box)), 
+        box)
     result[CartesianIndex.(subscripts)] .= true
     return result
 end
